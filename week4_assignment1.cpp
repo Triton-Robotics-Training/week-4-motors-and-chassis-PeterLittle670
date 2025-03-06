@@ -203,12 +203,28 @@ void remoteRead(bool debug = false){
 // Use prints and getData() for debugging purposes
 
 int main(){
+    // Initialize the motor with ID 1, CANBUS 1, and type M3508
+    DJIMotor motor(1, CANHandler::CANBus::CANBUS_1, M3508, "MainMotor");
     
-    //SETUP CODE HERE
-
-    while(true){ //main loop
-
-        //MAIN CODE HERE
-
+    while(true){ // Main loop
+        remoteRead(); // Read remote control input
+        int leftX = remote.leftX(); // Get left stick X value
+        Remote::SwitchState mode = remote.leftSwitch(); // Get switch state
+        
+        // Determine mode and set motor accordingly
+        if(mode == Remote::SwitchState::UP){
+            motor.setPower(20 * leftX);
+            std::cout << "Power Mode: Setting power to " << (20 * leftX) << "\n";
+        }
+        else if(mode == Remote::SwitchState::MID){
+            motor.setSpeed(5 * leftX);
+            std::cout << "Speed Mode: Setting speed to " << (5 * leftX) << "\n";
+        }
+        else if(mode == Remote::SwitchState::DOWN){
+            motor.setPosition(10 * leftX);
+            std::cout << "Position Mode: Setting position to " << (10 * leftX) << "\n";
+        }
+        
+        DJIMotor::s_sendValues(); // Send updated values to the motor
     }
 }
